@@ -116,7 +116,7 @@ var jsPDF = (function (global) {
     orientation = ('' + (orientation || 'P')).toLowerCase();
     var putOnlyUsedFonts = options.putOnlyUsedFonts || true;
     var usedFonts = {};
-    
+
     var API = {
       internal: {},
       __private__: {}
@@ -186,10 +186,7 @@ var jsPDF = (function (global) {
       return pageFormats[value];
     };
 
-    if (typeof format === "string") {
-        format = getPageFormat(format);
-    }
-    format = format || getPageFormat('a4');
+    format = format || 'a4';
 
     var f2 = API.f2 = API.__private__.f2 = function (number) {
       if (isNaN(number)) {
@@ -516,7 +513,7 @@ var jsPDF = (function (global) {
      *
      * @name setDisplayMode
      * @memberOf jsPDF
-     * @function 
+     * @function
      * @instance
      * @param {integer|String} zoom   You can pass an integer or percentage as
      * a string. 2 will scale the document up 2x, '200%' will scale up by the
@@ -606,7 +603,7 @@ var jsPDF = (function (global) {
         newObjectDeferredBegin(oid, true);
         return oid;
     };
-    
+
     // Does not output the object.  The caller must call newObjectDeferredBegin(oid) before outputing any data
     var newObjectDeferred = API.__private__.newObjectDeferred = function () {
       objectNumber++;
@@ -615,7 +612,7 @@ var jsPDF = (function (global) {
       };
       return objectNumber;
     };
-    
+
     var newObjectDeferredBegin = function (oid, doOutput) {
       doOutput = typeof (doOutput) === 'boolean' ? doOutput : false;
       offsets[oid] = content_length;
@@ -751,7 +748,7 @@ var jsPDF = (function (global) {
     var getFilters = API.__private__.getFilters = function () {
       return filters;
     };
-    
+
     var putStream = API.__private__.putStream = function (options) {
       options = options || {};
       var data = options.data || '';
@@ -768,7 +765,7 @@ var jsPDF = (function (global) {
       if (typeof jsPDF.API.processDataByFilters !== 'undefined') {
         processedData = jsPDF.API.processDataByFilters(data, filters);
       } else {
-        processedData = {data: data, reverseChain : []}  
+        processedData = {data: data, reverseChain : []}
       }
       var filterAsString = processedData.reverseChain + ((Array.isArray(alreadyAppliedFilters)) ? alreadyAppliedFilters.join(' ') : alreadyAppliedFilters.toString());
 
@@ -867,7 +864,7 @@ var jsPDF = (function (global) {
     }
     var putPages = API.__private__.putPages = function () {
       var n, p, i, pageObjectNumbers = [];
-      
+
       for (n = 1; n <= page; n++) {
         pagesContext[n].objId = newObjectDeferred();
         pagesContext[n].contentsObjId = newObjectDeferred();
@@ -885,7 +882,7 @@ var jsPDF = (function (global) {
           trimBox: pagesContext[n].trimBox,
           artBox: pagesContext[n].artBox,
           userUnit: pagesContext[n].userUnit,
-          rootDictionaryObjId: rootDictionaryObjId, 
+          rootDictionaryObjId: rootDictionaryObjId,
           resourceDictionaryObjId: resourceDictionaryObjId
         }));
       }
@@ -1019,7 +1016,7 @@ var jsPDF = (function (global) {
           arrayOfFonts[i][2],
           standardFonts[i][3],
           true);
-          
+
         usedFonts[fontKey] = true;
         // adding aliases for standard fonts, this time matching the capitalization
         var parts = arrayOfFonts[i][0].split('-');
@@ -1208,27 +1205,25 @@ var jsPDF = (function (global) {
       return to8bitStream(text, flags).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
     };
 
-    var beginPage = API.__private__.beginPage = function (width, height) {
-      var tmp;
-      // Dimensions are stored as user units and converted to points on output
-      var orientation = typeof height === 'string' && height.toLowerCase();
+    var beginPage = API.__private__.beginPage = function (parmFormat, parmOrientation) {
+      var tmp, width, height;
 
-      if (typeof width === 'string') {
-        if (tmp = getPageFormat(width.toLowerCase())) {
+      if (typeof parmFormat === 'string') {
+        if (tmp = getPageFormat(parmFormat.toLowerCase())) {
           width = tmp[0];
           height = tmp[1];
         }
       }
-      if (Array.isArray(width)) {
-        height = width[1];
-        width = width[0];
+      if (Array.isArray(parmFormat)) {
+        height = parmFormat[1] * k;
+        width = parmFormat[0] * k;
       }
-      if (isNaN(width) || isNaN(height)) {
+      if (isNaN(width)) {
         width = format[0];
         height = format[1];
       }
-      if (orientation) {
-        switch (orientation.substr(0, 1)) {
+      if (parmOrientation) {
+        switch (parmOrientation.substr(0, 1)) {
           case 'l':
             if (height > width) orientation = 's';
             break;
@@ -1461,7 +1456,7 @@ var jsPDF = (function (global) {
         }
       }
     };
-    
+
     var buildDocument = API.__private__.buildDocument = function () {
       outToPages = false; // switches out() to content
 
@@ -1500,7 +1495,7 @@ var jsPDF = (function (global) {
         type: "application/pdf"
       });
     };
-    
+
     /**
      * Generates the PDF document.
      *
@@ -1617,7 +1612,7 @@ var jsPDF = (function (global) {
 
     //---------------------------------------
     // Public API
-	
+
     var getPageInfo = API.__private__.getPageInfo = function (pageNumberOneBased) {
       if (isNaN(pageNumberOneBased) || (pageNumberOneBased % 1 !== 0)) {
         throw new Error('Invalid argument passed to jsPDF.getPageInfo');
@@ -1693,8 +1688,8 @@ var jsPDF = (function (global) {
     /**
      * @name insertPage
      * @memberOf jsPDF
-     * 
-     * @function 
+     *
+     * @function
      * @instance
      * @param {Object} beforePage
      * @returns {jsPDF}
@@ -1826,11 +1821,11 @@ var jsPDF = (function (global) {
           align: align
         };
       }
-      
+
       flags = flags || {};
       flags.noBOM = flags.noBOM || true;
       flags.autoencode = flags.autoencode || true;
-      
+
       if (isNaN(x) || isNaN(y) || typeof text === "undefined" || text === null) {
         throw new Error('Invalid arguments passed to jsPDF.text');
       }
@@ -1926,7 +1921,7 @@ var jsPDF = (function (global) {
         throw new Error('Type of text must be string or Array. "' + text + '" is not recognized.');
       }
 
-      //Escaping 
+      //Escaping
       var activeFontEncoding = fonts[activeFontKey].encoding;
 
       if (activeFontEncoding === "WinAnsiEncoding" || activeFontEncoding === "StandardEncoding") {
@@ -2076,7 +2071,7 @@ var jsPDF = (function (global) {
 
       var usedRenderingMode = typeof pageContext.usedRenderingMode !== 'undefined' ? pageContext.usedRenderingMode : -1;
 
-      //if the coder wrote it explicitly to use a specific 
+      //if the coder wrote it explicitly to use a specific
       //renderingMode, then use it
       if (tmpRenderingMode !== -1) {
         xtra += tmpRenderingMode + " Tr\n"
@@ -2296,11 +2291,11 @@ var jsPDF = (function (global) {
     };
 
     /**
-     * 
+     *
      * @name clip
      * @function
      * @instance
-     * @param {string} rule 
+     * @param {string} rule
      * @returns {jsPDF}
      * @memberOf jsPDF
      * @description All .clip() after calling drawing ops with a style argument of null.
@@ -2366,7 +2361,7 @@ var jsPDF = (function (global) {
      * Draw a line on the current page.
      *
      * @name line
-     * @function 
+     * @function
      * @instance
      * @param {number} x1
      * @param {number} y1
@@ -2771,9 +2766,9 @@ var jsPDF = (function (global) {
 
     /**
      * Sets the dash pattern for upcoming lines.
-     * 
+     *
      * To reset the settings simply call the method without any parameters.
-     * @param {array} dashArray The pattern of the line, expects numbers. 
+     * @param {array} dashArray The pattern of the line, expects numbers.
      * @param {number} dashPhase The phase at which the dash pattern starts.
      * @function
      * @instance
@@ -2840,7 +2835,7 @@ var jsPDF = (function (global) {
     };
 
     setLineHeightFactor(options.lineHeight);
-    
+
     var getHorizontalCoordinate = API.__private__.getHorizontalCoordinate = function (value) {
       return value * k;
     };
@@ -3196,10 +3191,10 @@ var jsPDF = (function (global) {
      */
     API.save = function (filename, options) {
       filename = filename || 'generated.pdf';
-      
+
       options = options || {};
       options.returnPromise = options.returnPromise || false;
-      
+
       if (options.returnPromise === false) {
           saveAs(getBlob(buildDocument()), filename);
           if (typeof saveAs.unload === 'function') {
